@@ -1,6 +1,7 @@
 import React, {useState, useEffect, useRef} from 'react';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import {faSearch, faTimes} from '@fortawesome/free-solid-svg-icons';
+import PropTypes from 'prop-types';
 
 const FileSearch = ({title, onFileSearch}) => {
     const [inputActive, setInputActive] = useState(false);
@@ -77,5 +78,14 @@ const FileSearch = ({title, onFileSearch}) => {
             }
         </div>
     )
+}
+// 用来检查传来的值的类型
+FileSearch.propTypes = {
+    title: PropTypes.string, // string
+    onFileSearch: PropTypes.func.isRequired // function类型且是必传的
+}
+// 组件添加默认属性
+FileSearch.defaultProps = {
+    title:'我的云文档'
 }
 export default FileSearch;
