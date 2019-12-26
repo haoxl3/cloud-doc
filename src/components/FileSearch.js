@@ -2,32 +2,25 @@ import React, {useState, useEffect, useRef} from 'react';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import {faSearch, faTimes} from '@fortawesome/free-solid-svg-icons';
 import PropTypes from 'prop-types';
+import useKeyPress from '../hooks/useKeyPress';
 
 const FileSearch = ({title, onFileSearch}) => {
     const [inputActive, setInputActive] = useState(false);
     const [value, setValue] = useState('');
+    const enterPressed = useKeyPress(13);
+    const escPressed = useKeyPress(27);
     let node = useRef(null); // 它将记住上一个节点
 
-    const closeSearch = (e) => {
-        e.preventDefault();
+    const closeSearch = () => {
         setInputActive(false);
         setValue('');
     }
     useEffect(() => {
-        const handleInputEvent = (event) => {
-            const {keyCode} = event;
-            if (keyCode === 13 && inputActive) {
-                onFileSearch(value);
-            }
-            else if (keyCode === 27 && inputActive) {
-                closeSearch(event);
-            }
-        } 
-        // 注册事件
-        document.addEventListener('keyup', handleInputEvent);
-        // 移除事件
-        return () => {
-            document.removeEventListener('keyup', handleInputEvent);
+        if (enterPressed && inputActive) {
+            onFileSearch(value);
+        }
+        if (escPressed && inputActive) {
+            closeSearch();
         }
     })
     useEffect(() => {
