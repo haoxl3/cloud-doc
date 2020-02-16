@@ -39,10 +39,15 @@
     ]
   },
   "devDependencies": {
+    "classnames": "^2.2.6",
     "concurrently": "^5.0.2",
     "cross-env": "^6.0.3",
     "electron": "^7.1.7",
     "electron-is-dev": "^1.1.0",
+    "electron-store": "^5.1.0",
+    "node-sass": "^4.13.1",
+    "react-simplemde-editor": "^4.1.0",
+    "uuid": "^3.4.0",
     "wait-on": "^3.3.0"
   }
 }

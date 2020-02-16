@@ -14,6 +14,8 @@ const FileSearch = ({title, onFileSearch}) => {
     const closeSearch = () => {
         setInputActive(false);
         setValue('');
+        // 关闭搜索时要还原文件
+        onFileSearch('');
     }
     useEffect(() => {
         if (enterPressed && inputActive) {
