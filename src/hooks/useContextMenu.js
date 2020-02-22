@@ -20,7 +20,7 @@ const useContextMenu = (itemArr, targetSelector, deps) => {
         return () => {
             window.removeEventListener('contextmenu', handleContextMenu);
         };
-    }, deps);
+    }, deps); // 当deps参数有改变时将重新running
     return clickedElement;
 };
 

@@ -30,6 +30,7 @@ const FileList = ({files, onFileClick, onSaveEdit, onFileDelete}) => {
             click: () => {
                 const parentElement = getParentNode(clickedItem.current, 'file-item');
                 if (parentElement) {
+                    // 在app.js中
                     onFileClick(parentElement.dataset.id);
                 }
             }
@@ -47,31 +48,7 @@ const FileList = ({files, onFileClick, onSaveEdit, onFileDelete}) => {
             }
         }
     ], '.file-list', [files]);
-    useEffect(() => {
-        const menu = new Menu();
-        menu.append(new MenuItem({
-            label: '打开',
-            click: () => {
-                console.log('open');
-            }
-        }));
-    });
-    useEffect(() => {
-        const menu = new Menu();
-        menu.append(new MenuItem({
-            label: '打开',
-            click: () => {
-                console.log('open');
-            }
-        }));
-        const handleContextMenu = e => {
-            menu.popup({window: remote.getCurrentWindow()});
-        };
-        window.addEventListener('contextmenu', handleContextMenu);
-        return () => {
-            window.removeEventListener('contextmenu', handleContextMenu);
-        };
-    });
+
     useEffect(() => {
         const editItem = files.find(file => file.id === editStatus);
         if (enterPressed && editStatus && value.trim() !== '') {
@@ -95,28 +72,7 @@ const FileList = ({files, onFileClick, onSaveEdit, onFileDelete}) => {
             node.current.focus();
         }
     }, [editStatus]);
-    // useEffect(() => {
-    //     const handleInputEvent = (event) => {
-    //         const {keyCode} = event;
-    //         if (keyCode === 13 && editStatus) {
-    //             // 寻找file.id和editStatus一样的文件
-    //             const editItem = files.find(file => file.id === editStatus)
-    //             onSaveEdit(editItem.id, value);
-    //             setEditStatus(false);
-    //             setValue('');
-    //         }
-    //         else if (keyCode === 27 && editStatus) {
-    //             closeSearch(event);
-    //         }
-    //     }
-    //     // 注册事件
-    //     document.addEventListener('keyup', handleInputEvent);
-    //     // 移除事件
-    //     return () => {
-    //         document.removeEventListener('keyup', handleInputEvent);
-    //     }
-    // })
-
+    
     return (
         <ul className="list-group list-group-flush file-list">
             {
