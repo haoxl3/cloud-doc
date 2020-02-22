@@ -10,7 +10,6 @@ import 'easymde/dist/easymde.min.css';
 
 import FileSearch from './components/FileSearch';
 import FileList from './components/FileList';
-import defaultFiles from './utils/defaultFiles';
 import BottomBtn from './components/BottomBtn';
 import TabList from './components/TabList';
 import useIpcRenderer from './hooks/useIpcRenderer';
@@ -160,7 +159,8 @@ function App() {
             filters: [
                 {name: 'Markdown files', extensions: ['md']}
             ]
-        }, paths => {
+        }).then((importFiles) => {
+            let paths = importFiles.filePaths;
             if (Array.isArray(paths)) {
                 // 过滤掉已导入的同名文件
                 const filteredPaths = paths.filter(path => {
@@ -190,6 +190,8 @@ function App() {
                     });
                 }
             }
+        }).catch(err => {
+            console.log(err);
         });
     };
     useIpcRenderer({
