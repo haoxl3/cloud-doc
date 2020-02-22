@@ -1,5 +1,6 @@
 const {app, BrowserWindow, Menu, ipcMain} = require('electron');
 const isDev = require('electron-is-dev');
+const path = require('path')
 const menuTemplate = require('./src/menuTemplate');
 const AppWindow = require('./src/AppWindow');
 let mainWindow;
@@ -17,6 +18,7 @@ app.on('ready', () => {
     });
     // 打开一个新的窗口
     ipcMain.on('open-settings-window', () => {
+        debugger;
         const settingsWindowConfig = {
             width: 500,
             height: 400,

@@ -36,8 +36,6 @@ const saveFilesToStore = files => {
 
 function App() {
     const [files, setFiles] = useState(fileStore.get('files') || {});
-    console.log('************files*********')
-    console.log(files);
     const [activeFileID, setActiveFileID] = useState('');
     const [openedFileIDs, setOpenedFileIDs] = useState([]);
     const [unsavedFileIDs, setUnsavedFileIDs] = useState([]);

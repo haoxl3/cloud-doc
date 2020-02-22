@@ -1,5 +1,5 @@
 const {BrowserWindow} = require('electron');
-
+// 因为有2个窗口，为了解耦使用继承
 class AppWindow extends BrowserWindow {
     constructor(config, urlLocation) {
         const basicConfig = {

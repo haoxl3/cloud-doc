@@ -6,7 +6,7 @@ let template = [{
         label: '新建',
         accelerator: 'CmdOrCtrl+N',
         click: (menuItem, browserWindow, event) => {
-            browserWindow.webContents.send('creat-new-file');
+            browserWindow.webContents.send('create-new-file');
         }
     }, {
         label: '保存',
@@ -18,7 +18,13 @@ let template = [{
         label: '搜索',
         accelerator: 'CmdOrCtrl+F',
         click: (menuItem, browserWindow, event) => {
-            
+            browserWindow.webContents.send('search-file');
+        }
+    }, {
+        label: '导入',
+        accelerator: 'CmdOrCtrl+O',
+        click: (menuItem, browserWindow, event) => {
+            browserWindow.webContents.send('import-file');
         }
     }]
 }, {
@@ -174,7 +180,7 @@ else {
         label: '设置',
         accelerator: 'Ctrl+,',
         click: () => {
-
+            ipcMain.emit('open-settings-window');
         }
     })
 }

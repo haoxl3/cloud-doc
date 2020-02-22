@@ -6,6 +6,11 @@ const useIpcRenderer = keyCallbackMap => {
         Object.keys(keyCallbackMap).forEach(key => {
             ipcRenderer.on(key, keyCallbackMap[key]);
         });
+        return () => {
+            Object.keys(keyCallbackMap).forEach(key => {
+                ipcRenderer.removeListener(key, keyCallbackMap[key]);
+            });
+        }
     });
 };
 
