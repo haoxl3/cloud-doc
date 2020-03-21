@@ -19,10 +19,11 @@ const {remote, ipcRenderer} = window.require('electron');
 const Store = window.require('electron-store');
 const fileStore = new Store({'name': 'Files Data'});
 const settingsStore = new Store({name: 'Settings'});
+const getAutoSync = () => ['accessKey', 'secretKey', 'bucketName', 'enableAutoSync'].every(key => !!settingsStore.get(key));
 
 const saveFilesToStore = files => {
     const filesStoreObj = objToArr(files).reduce((result, file) => {
-        const {id, path, title, createdAt} = file;
+        const {id, path, title, createdAt, isSynced, updatedAt} = file;
         result[id] = {
             id,
             path,
@@ -146,8 +147,13 @@ function App() {
         setFiles({...files, [newID]: newFile});
     };
     const saveCurrentFile = () => {
-        fileHelper.writeFile(activeFile.path, activeFile.body).then(() => {
+        const {path, body, title} = activeFile;
+        fileHelper.writeFile(path, body).then(() => {
             setUnsavedFileIDs(unsavedFileIDs.filter(id => id !== activeFile.id));
+            // 如果自动保存被勾选，则上传文件
+            if (getAutoSync()) {
+                ipcRenderer.send('upload-file', {key: `${title}.md`, path})
+            }
         });
     };
     const importFiles = () => {
@@ -192,10 +198,18 @@ function App() {
             console.log(err);
         });
     };
+    const activeFileUploaded = () => {
+        const {id} = activeFile;
+        const modifiedFile = {...files[id], isSynced: true, updatedAt: new Date().getTime()};
+        const newFiles = {...files, [id]: modifiedFile};
+        setFiles(newFiles);
+        saveFilesToStore(newFiles);
+    }
     useIpcRenderer({
         'create-new-file': createNewFile,
         'import-file': importFiles,
-        'save-edit-file': saveCurrentFile
+        'save-edit-file': saveCurrentFile,
+        'active-file-uploaded': activeFileUploaded
     });
     return (
         <div className="App container-fluid px-0">
