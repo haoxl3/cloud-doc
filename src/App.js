@@ -53,12 +53,17 @@ function App() {
         // 将当前点击的文件高亮
         setActiveFileID(fileID);
         const currentFile = files[fileID];
-        // 如果文件未加载，则去读取
-        if (!currentFile.isLoaded) {
-            fileHelper.readFile(currentFile.path).then(value => {
-                const newFile = {...files[fileID], body: value, isLoaded: true};
-                setFiles({...files, [fileID]: newFile});
-            });
+        const {id, title, path, isLoaded} = currentFile;
+        if (!isLoaded) {
+            // 如果设置了自动同步，则需要从七牛云上下载文件
+            if (getAutoSync()) {
+                ipcRenderer.send('download-file', {key: `${title}.md`, path, id});
+            } else {
+                fileHelper.readFile(currentFile.path).then(value => {
+                    const newFile = {...files[fileID], body: value, isLoaded: true};
+                    setFiles({...files, [fileID]: newFile});
+                });
+            }
         }
         // 将打开的文件记录下来
         if (!openedFileIDs.includes(fileID)) {
@@ -205,11 +210,27 @@ function App() {
         setFiles(newFiles);
         saveFilesToStore(newFiles);
     }
+    const activeFileDownloaded = (event, message) => {
+        const currentFile = files[message.id];
+        const {id, path} = currentFile;
+        fileHelper.readFile(path).then(value => {
+            let newFile;
+            if (message.status === 'download-success') {
+                newFile = {...files[id], body: value, isLoaded: true, isSynced: true, updatedAt: new Date().getTime() };
+            } else {
+                newFile = {...files[id], body: value, isLoaded: true};
+            }
+            const newFiles = {...files, [id]: newFile};
+            setFiles(newFiles);
+            saveFilesToStore(newFiles);
+        })
+    }
     useIpcRenderer({
         'create-new-file': createNewFile,
         'import-file': importFiles,
         'save-edit-file': saveCurrentFile,
-        'active-file-uploaded': activeFileUploaded
+        'active-file-uploaded': activeFileUploaded,
+        'file-downloaded': activeFileDownloaded
     });
     return (
         <div className="App container-fluid px-0">

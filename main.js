@@ -6,6 +6,7 @@ const AppWindow = require('./src/AppWindow');
 const Store = require('electron-store');
 const QiniuManager = require('./src/utils/QiniuManager');
 const settingsStore = new Store({name:'Settings'});
+const fileStore = new Store({name: 'Files Data'});
 let mainWindow;
 let settingsWindow;
 
@@ -48,6 +49,33 @@ app.on('ready', () => {
             mainWindow.webContents.send('active-file-uploaded')
         }).catch(() => {
             dialog.showErrorBox('同步失败', '请检查七牛云参数是否正确');
+        })
+    });
+    ipcMain.on('download-file', (event, data) => {
+        const manager = createManager();
+        const filesObj = fileStore.get('files');
+        const {key, path, id} = data;
+        manager.getStat(data.key).then(resp => {
+            console.log('resp', resp);
+            console.log('filesObj', filesObj[data.id]);
+            // 七牛云上面用的纳秒时间，所以要转换
+            const serverUpdatedTime = Math.round(resp.putTime / 10000);
+            console.log('qiniu', serverUpdatedTime);
+            const localUpdatedTime = filesObj[id].updatedAt; // 缺少属性updatedAt
+            console.log('local', localUpdatedTime);
+            // 如果本地时间比七牛云上面时间小或者没有，则从七牛上下载文件
+            if (serverUpdatedTime > localUpdatedTime || !localUpdatedTime) {
+                manager.downloadFile(key, path).then(() => {
+                    mainWindow.webContents.send('file-downloaded', {status: 'download-success', id});
+                })
+            } else {
+                mainWindow.webContents.send('file-downloaded', {status: 'no-new-file', id});
+            }
+        }, error => {
+            console.log(error);
+            if (error.statusCode === 612) {
+                mainWindow.webContents.send('file-downloaded', {status: 'no-file', id})
+            }
         })
     })
     ipcMain.on('config-is-saved', () => {

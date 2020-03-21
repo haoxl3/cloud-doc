@@ -40,6 +40,12 @@ class QiniuManager {
             qiniu.rpc.postWithoutForm(reqURL, digest, this._handleCallback(resolve, reject));
         });
     }
+    // 获取文件信息
+    getStat(key) {
+        return new Promise((resolve, reject) => {
+            this.bucketManager.stat(this.bucket, key, this._handleCallback(resolve, reject))
+        })
+    }
     // 组装下载链接
     generateDownloadLink(key) {
         const domainPromise = this.publicBucketDomain ?
