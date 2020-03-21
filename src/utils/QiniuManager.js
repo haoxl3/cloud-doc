@@ -19,29 +19,61 @@ class QiniuManager {
         const putExtra = new qiniu.form_up.PutExtra();
 
         // 文件上传
-        formUploader.putFile(uploadToken, key, localFilePath, putExtra, function(respErr, respBody, respInfo) {
-            if (respErr) {
-                throw respErr;
-            }
-            if (respInfo.statusCode == 200) {
-                console.log(respBody);
-            } else {
-                console.log(respInfo.statusCode);
-                console.log(respBody);
-            }
+        return new Promise((resolve, reject) => {
+            formUploader.putFile(uploadToken, key, localFilePath, putExtra, this._handleCallback(resolve, reject));
         })
     }
     // 删除文件
     deleteFile(key) {
-        this.bucketManager.delete(this.bucket, key, function(err, respBody, respInfo) {
-            if (err) {
-              console.log(err);
-              //throw err;
-            } else {
-              console.log(respInfo.statusCode);
-              console.log(respBody);
-            }
+        return new Promise((resolve, reject) => {
+            this.bucketManager.delete(this.bucket, key, this._handleCallback(resolve, reject));
         });
+    }
+    // 获取域名 https://developer.qiniu.com/kodo/api/3949/get-the-bucket-space-domain
+    getBucketDomain() {
+        const reqURL = `http://api.qiniu.com/v6/domain/list?tbl=${this.bucket}`;
+        const digest = qiniu.util.generateAccessToken(this.mac, reqURL);
+        console.log('trigger here');
+        return new Promise((resolve, reject) => {
+            qiniu.rpc.postWithoutForm(reqURL, digest, this._handleCallback(resolve, reject));
+        });
+    }
+    // 组装下载链接
+    generateDownloadLink(key) {
+        const domainPromise = this.publicBucketDomain ?
+        Promise.resolve([this.publicBucketDomain]) : this.getBucketDomain();
+        return domainPromise.then(data => {
+            // 判断域名有没有过期
+            if (Array.isArray(data) && data.length > 0) {
+                console.log(data);
+                // 七牛自带的域名未加请求头，所以要判断并加上
+                const pattern = /^https?/;
+                console.log(pattern.test(data[0]))
+                this.publicBucketDomain = pattern.test(data[0]) ? data[0] : `http://${data[0]}`;
+                // return this.publicBucketDomain;
+                return this.bucketManager.publicDownloadUrl(this.publicBucketDomain, key);
+            } else {
+                throw Error('域名未找到，请查看存储空间是否已经过期！')
+            }
+        })
+    }
+    _handleCallback(resolve, reject) {
+        return (respErr, respBody, respInfo) => {
+            if (respErr) {
+                throw respErr;
+            }
+            if (respInfo.statusCode == 200) {
+                resolve(respBody);
+                console.log(respBody);
+            } else {
+                reject({
+                    statusCode: respInfo.statusCode,
+                    body: respBody
+                });
+                console.log(respInfo.statusCode);
+                console.log(respBody);
+            }
+        }
     }
 }
 module.exports = QiniuManager

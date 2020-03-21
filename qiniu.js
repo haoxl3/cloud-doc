@@ -7,7 +7,26 @@ const key = 'name.md';
 
 const manager = new QiniuManager(accessKey, secretKey, 'cloudhaoxl');
 // manager.uploadFile(key, localFile);
-manager.deleteFile(key);
+// manager.deleteFile(key);
+// manager.uploadFile(key, localFile).then(data => {
+//     console.log('upload success', data);
+//     return manager.deleteFile(key);
+// }).then(data => {
+//     console.log('delete success')
+// }).catch(err => {
+//     console.log('delete fail')
+// })
+manager.generateDownloadLink(key).then(data => {
+    console.log(data)
+    return manager.generateDownloadLink('name.md')
+}).then(data => {
+    console.log(data)
+})
+
+// manager.getBucketDomain().then(data => {
+//     console.log(data);
+// })
+
 // 下载文件
 // var bucketManager = new qiniu.rs.BucketManager(mac, config);
 // var publicBucketDomain = 'http://q78ctcq7h.bkt.clouddn.com';
