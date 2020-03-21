@@ -1,9 +1,10 @@
 const QiniuManager = require('./src/utils/QiniuManager');
-
+const path = require('path')
 var accessKey = 'iDKB7C3zD5mm8SLUEa3-3zXUinVi9OeZdiaaLy8L';
 var secretKey = 'eLPzGjTsJhDkOzM-dJ92N_5qxpCi7F4cXJ65OcqE';
 const localFile = 'E:\\name.md';
 const key = 'name.md';
+const downloadPath = path.join(__dirname, key);
 
 const manager = new QiniuManager(accessKey, secretKey, 'cloudhaoxl');
 // manager.uploadFile(key, localFile);
@@ -16,12 +17,13 @@ const manager = new QiniuManager(accessKey, secretKey, 'cloudhaoxl');
 // }).catch(err => {
 //     console.log('delete fail')
 // })
-manager.generateDownloadLink(key).then(data => {
-    console.log(data)
-    return manager.generateDownloadLink('name.md')
-}).then(data => {
-    console.log(data)
-})
+
+// manager.generateDownloadLink(key).then(data => {
+//     console.log(data)
+//     return manager.generateDownloadLink('name.md')
+// }).then(data => {
+//     console.log(data)
+// })
 
 // manager.getBucketDomain().then(data => {
 //     console.log(data);
@@ -33,3 +35,5 @@ manager.generateDownloadLink(key).then(data => {
 // 公开空间访问链接
 // var publicDownloadUrl = bucketManager.publicDownloadUrl(publicBucketDomain, key);
 // console.log(publicDownloadUrl);
+
+manager.downloadFile(key, downloadPath);
