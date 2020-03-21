@@ -3,7 +3,7 @@ import './App.css';
 import {faPlus, faFileImport, faSave} from '@fortawesome/free-solid-svg-icons';
 import SimpleMDE from 'react-simplemde-editor';
 import uuidv4 from 'uuid/v4';
-import {flattenArr, objToArr} from './utils/helper';
+import {flattenArr, objToArr, timestampToString} from './utils/helper';
 import fileHelper from './utils/fileHelper';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'easymde/dist/easymde.min.css';
@@ -268,6 +268,9 @@ function App() {
                                 minHeight: '515px'
                             }}
                         />
+                        { activeFile.isSynced &&
+                            <span className="sync-status">已同步，上次同步{timestampToString(activeFile.updatedAt)}</span>
+                        }
                     </>
                 }
                 </div>

@@ -9,7 +9,7 @@ const settingsStore = new Store({name:'Settings'});
 let mainWindow;
 let settingsWindow;
 
-const createmanager = () => {
+const createManager = () => {
     const accessKey = settingsStore.get('accessKey');
     const secretKey = settingsStore.get('secretKey');
     const bucketName = settingsStore.get('bucketName');
@@ -41,10 +41,11 @@ app.on('ready', () => {
         });
     });
     ipcMain.on('upload-file', (event, data) => {
-        const manager = createmanager();
+        const manager = createManager();
         manager.uploadFile(data.key, data.path).then(data => {
             // 上传成功后将本地持久化存储的文件也更新一下
-            mainWindow.webContens.send('active-file-uploaded')
+            console.log('upload success', data);
+            mainWindow.webContents.send('active-file-uploaded')
         }).catch(() => {
             dialog.showErrorBox('同步失败', '请检查七牛云参数是否正确');
         })
