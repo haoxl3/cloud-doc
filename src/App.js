@@ -28,10 +28,13 @@ const saveFilesToStore = files => {
             id,
             path,
             title,
-            createdAt
+            createdAt,
+            isSynced,
+            updatedAt
         };
         return result;
     }, {});
+    console.log('*****files****', filesStoreObj)
     fileStore.set('files', filesStoreObj);
 };
 
